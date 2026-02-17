@@ -68,14 +68,44 @@ variable "create_listeners" {
 
 variable "listeners" {
   description = "A map of listener defintions to create"
-  type        = any
-  default     = {}
+  type = map(object({
+    client_affinity = optional(string)
+    protocol        = optional(string)
+    port_ranges = optional(list(object({
+      from_port = optional(number)
+      to_port   = optional(number)
+    })))
+    endpoint_groups = optional(map(object({
+      endpoint_group_region         = optional(string)
+      health_check_interval_seconds = optional(number)
+      health_check_path             = optional(string)
+      health_check_port             = optional(number)
+      health_check_protocol         = optional(string)
+      threshold_count               = optional(number)
+      traffic_dial_percentage       = optional(number)
+      endpoint_configuration = optional(list(object({
+        attachment_arn                 = optional(string)
+        client_ip_preservation_enabled = optional(bool)
+        endpoint_id                    = optional(string)
+        weight                         = optional(number)
+      })))
+      port_override = optional(list(object({
+        endpoint_port = optional(number)
+        listener_port = optional(number)
+      })))
+    })))
+  }))
+  default = {}
 }
 
 variable "listeners_timeouts" {
   description = "Create, update, and delete timeout configurations for the listeners"
-  type        = map(string)
-  default     = {}
+  type = object({
+    create = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default = null
 }
 
 ################################################################################
@@ -86,6 +116,10 @@ variable "listeners_timeouts" {
 
 variable "endpoint_groups_timeouts" {
   description = "Create, update, and delete timeout configurations for the endpoint groups"
-  type        = map(string)
-  default     = {}
+  type = object({
+    create = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default = null
 }

@@ -68,14 +68,37 @@ variable "create_listeners" {
 
 variable "listeners" {
   description = "A map of listener defintions to create"
-  type        = any
-  default     = {}
+  type = map(object({
+    port_ranges = optional(list(object({
+      from_port = optional(number)
+      to_port   = optional(number)
+    })))
+    endpoint_groups = optional(map(object({
+      endpoint_group_region = optional(string)
+      destination_configuration = optional(list(object({
+        from_port = number
+        protocols = list(string)
+        to_port   = number
+      })))
+      endpoint_configuration = optional(list(object({
+        attachment_arn                 = optional(string)
+        client_ip_preservation_enabled = optional(bool)
+        endpoint_id                    = optional(string)
+        weight                         = optional(number)
+      })))
+    })))
+  }))
+  default = {}
 }
 
 variable "listeners_timeouts" {
   description = "Create, update, and delete timeout configurations for the listeners"
-  type        = map(string)
-  default     = {}
+  type = object({
+    create = optional(string)
+    update = optional(string)
+    delete = optional(string)
+  })
+  default = null
 }
 
 ################################################################################
@@ -86,6 +109,9 @@ variable "listeners_timeouts" {
 
 variable "endpoint_groups_timeouts" {
   description = "Create, update, and delete timeout configurations for the endpoint groups"
-  type        = map(string)
-  default     = {}
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+  })
+  default = null
 }

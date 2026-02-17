@@ -11,7 +11,7 @@ resource "aws_globalaccelerator_custom_routing_accelerator" "this" {
   enabled         = var.enabled
 
   dynamic "attributes" {
-    for_each = var.flow_logs_enabled ? [1] : []
+    for_each = var.flow_logs_enabled ? [var.flow_logs_enabled] : []
     content {
       flow_logs_enabled   = var.flow_logs_enabled
       flow_logs_s3_bucket = var.flow_logs_s3_bucket
@@ -32,17 +32,20 @@ resource "aws_globalaccelerator_custom_routing_listener" "this" {
   accelerator_arn = aws_globalaccelerator_custom_routing_accelerator.this[0].id
 
   dynamic "port_range" {
-    for_each = try(each.value.port_ranges, null) != null ? each.value.port_ranges : []
+    for_each = each.value.port_ranges != null ? each.value.port_ranges : []
     content {
-      from_port = try(port_range.value.from_port, null)
-      to_port   = try(port_range.value.to_port, null)
+      from_port = port_range.value.from_port
+      to_port   = port_range.value.to_port
     }
   }
 
-  timeouts {
-    create = try(var.listeners_timeouts.create, null)
-    update = try(var.listeners_timeouts.update, null)
-    delete = try(var.listeners_timeouts.delete, null)
+  dynamic "timeouts" {
+    for_each = var.listeners_timeouts != null ? [var.listeners_timeouts] : []
+    content {
+      create = timeouts.value.create
+      update = timeouts.value.update
+      delete = timeouts.value.delete
+    }
   }
 }
 
@@ -57,7 +60,7 @@ locals {
         endpoint_group         = endpoint_group
         endpoint_group_configs = endpoint_group_configs
       }
-    ] if length(lookup(listener_configs, "endpoint_groups", {})) > 0
+    ] if listener_configs.endpoint_groups != null
   ])
 }
 
@@ -65,10 +68,10 @@ resource "aws_globalaccelerator_custom_routing_endpoint_group" "this" {
   for_each = { for k, v in local.endpoint_groups : "${v.listener}:${v.endpoint_group}" => v if var.create && var.create_listeners }
 
   listener_arn          = aws_globalaccelerator_custom_routing_listener.this[each.value.listener].id
-  endpoint_group_region = try(each.value.endpoint_group_configs.endpoint_group_region, null)
+  endpoint_group_region = each.value.endpoint_group_configs.endpoint_group_region
 
   dynamic "destination_configuration" {
-    for_each = [for e in try(each.value.endpoint_group_configs.destination_configuration, []) : e]
+    for_each = each.value.endpoint_group_configs.destination_configuration != null ? each.value.endpoint_group_configs.destination_configuration : []
     content {
       from_port = destination_configuration.value.from_port
       protocols = destination_configuration.value.protocols
@@ -77,14 +80,17 @@ resource "aws_globalaccelerator_custom_routing_endpoint_group" "this" {
   }
 
   dynamic "endpoint_configuration" {
-    for_each = [for e in try(each.value.endpoint_group_configs.endpoint_configuration, []) : e if can(e.endpoint_id)]
+    for_each = each.value.endpoint_group_configs.endpoint_configuration != null ? each.value.endpoint_group_configs.endpoint_configuration : []
     content {
       endpoint_id = endpoint_configuration.value.endpoint_id
     }
   }
 
-  timeouts {
-    create = try(var.endpoint_groups_timeouts.create, null)
-    delete = try(var.endpoint_groups_timeouts.delete, null)
+  dynamic "timeouts" {
+    for_each = var.endpoint_groups_timeouts != null ? [var.endpoint_groups_timeouts] : []
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+    }
   }
 }

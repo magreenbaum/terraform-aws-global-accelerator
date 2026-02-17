@@ -27,7 +27,7 @@ data "aws_caller_identity" "current" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "~> 6.0"
 
   name = local.name
   cidr = "10.99.0.0/18"
@@ -40,7 +40,7 @@ module "vpc" {
 
 module "secondary_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "~> 6.0"
 
   name = local.name
   cidr = "10.98.0.0/18"
@@ -114,7 +114,7 @@ module "secondary_alb" {
 
 module "s3_log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   bucket = "${local.name}-flowlogs-${data.aws_caller_identity.current.account_id}-${local.region}"
 

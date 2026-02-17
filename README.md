@@ -111,13 +111,13 @@ Examples codified under the [`examples`](https://github.com/terraform-aws-module
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.84 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.6 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.84 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.6 |
 
 ## Modules
 
@@ -138,14 +138,14 @@ No modules.
 | <a name="input_create"></a> [create](#input\_create) | Controls if resources should be created (affects nearly all resources) | `bool` | `true` | no |
 | <a name="input_create_listeners"></a> [create\_listeners](#input\_create\_listeners) | Controls if listeners should be created (affects only listeners) | `bool` | `true` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Indicates whether the accelerator is enabled. Defaults to `true`. Valid values: `true`, `false` | `bool` | `true` | no |
-| <a name="input_endpoint_groups_timeouts"></a> [endpoint\_groups\_timeouts](#input\_endpoint\_groups\_timeouts) | Create, update, and delete timeout configurations for the endpoint groups | `map(string)` | `{}` | no |
+| <a name="input_endpoint_groups_timeouts"></a> [endpoint\_groups\_timeouts](#input\_endpoint\_groups\_timeouts) | Create, update, and delete timeout configurations for the endpoint groups | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_flow_logs_enabled"></a> [flow\_logs\_enabled](#input\_flow\_logs\_enabled) | Indicates whether flow logs are enabled. Defaults to `false` | `bool` | `false` | no |
 | <a name="input_flow_logs_s3_bucket"></a> [flow\_logs\_s3\_bucket](#input\_flow\_logs\_s3\_bucket) | The name of the Amazon S3 bucket for the flow logs. Required if `flow_logs_enabled` is `true` | `string` | `null` | no |
 | <a name="input_flow_logs_s3_prefix"></a> [flow\_logs\_s3\_prefix](#input\_flow\_logs\_s3\_prefix) | The prefix for the location in the Amazon S3 bucket for the flow logs. Required if `flow_logs_enabled` is `true` | `string` | `null` | no |
 | <a name="input_ip_address_type"></a> [ip\_address\_type](#input\_ip\_address\_type) | The value for the address type. Defaults to `IPV4`. Valid values: `IPV4`, `DUAL_STACK` | `string` | `"IPV4"` | no |
 | <a name="input_ip_addresses"></a> [ip\_addresses](#input\_ip\_addresses) | The IP addresses to use for BYOIP accelerators. If not specified, the service assigns IP addresses. Valid values: 1 or 2 IPv4 addresses | `list(string)` | `[]` | no |
-| <a name="input_listeners"></a> [listeners](#input\_listeners) | A map of listener defintions to create | `any` | `{}` | no |
-| <a name="input_listeners_timeouts"></a> [listeners\_timeouts](#input\_listeners\_timeouts) | Create, update, and delete timeout configurations for the listeners | `map(string)` | `{}` | no |
+| <a name="input_listeners"></a> [listeners](#input\_listeners) | A map of listener defintions to create | <pre>map(object({<br/>    client_affinity = optional(string)<br/>    protocol        = optional(string)<br/>    port_ranges = optional(list(object({<br/>      from_port = optional(number)<br/>      to_port   = optional(number)<br/>    })))<br/>    endpoint_groups = optional(map(object({<br/>      endpoint_group_region         = optional(string)<br/>      health_check_interval_seconds = optional(number)<br/>      health_check_path             = optional(string)<br/>      health_check_port             = optional(number)<br/>      health_check_protocol         = optional(string)<br/>      threshold_count               = optional(number)<br/>      traffic_dial_percentage       = optional(number)<br/>      endpoint_configuration = optional(list(object({<br/>        attachment_arn                 = optional(string)<br/>        client_ip_preservation_enabled = optional(bool)<br/>        endpoint_id                    = optional(string)<br/>        weight                         = optional(number)<br/>      })))<br/>      port_override = optional(list(object({<br/>        endpoint_port = optional(number)<br/>        listener_port = optional(number)<br/>      })))<br/>    })))<br/>  }))</pre> | `{}` | no |
+| <a name="input_listeners_timeouts"></a> [listeners\_timeouts](#input\_listeners\_timeouts) | Create, update, and delete timeout configurations for the listeners | <pre>object({<br/>    create = optional(string)<br/>    update = optional(string)<br/>    delete = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the accelerator | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
 
