@@ -311,23 +311,3 @@ module "global_accelerator" {
 
   tags = local.tags
 }
-
-moved {
-  from = module.secondary_alb.aws_lb_listener.frontend_http_tcp[0]
-  to   = module.secondary_alb.aws_lb_listener.this["http"]
-}
-
-moved {
-  from = module.secondary_alb.aws_lb_target_group.main[0]
-  to   = module.secondary_alb.aws_lb_target_group.this["http"]
-}
-
-moved {
-  from = module.alb.aws_lb_listener.frontend_http_tcp[0]
-  to   = module.alb.aws_lb_listener.this["http"]
-}
-
-moved {
-  from = module.alb.aws_lb_target_group.main[0]
-  to   = module.alb.aws_lb_target_group.this["http"]
-}
