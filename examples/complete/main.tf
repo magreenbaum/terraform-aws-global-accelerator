@@ -58,7 +58,7 @@ module "secondary_vpc" {
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
-  version = "~> 7.0"
+  version = "~> 10.0"
 
   name               = local.name
   load_balancer_type = "application"
@@ -67,24 +67,31 @@ module "alb" {
   subnets         = module.vpc.public_subnets
   security_groups = [module.vpc.default_security_group_id]
 
-  http_tcp_listeners = [{
-    port               = 80
-    protocol           = "HTTP"
-    target_group_index = 0
-  }]
+  listeners = {
+    http = {
+      port     = 80
+      protocol = "HTTP"
+      forward = {
+        target_group_key = "http"
+      }
+    }
+  }
 
-  target_groups = [{
-    backend_protocol = "HTTP"
-    backend_port     = 80
-    target_type      = "ip"
-  }]
+  target_groups = {
+    http = {
+      backend_protocol  = "HTTP"
+      backend_port      = 80
+      target_type       = "ip"
+      create_attachment = false
+    }
+  }
 
   tags = local.tags
 }
 
 module "secondary_alb" {
   source  = "terraform-aws-modules/alb/aws"
-  version = "~> 7.0"
+  version = "~> 10.0"
 
   name               = local.name
   load_balancer_type = "application"
@@ -93,17 +100,24 @@ module "secondary_alb" {
   subnets         = module.secondary_vpc.public_subnets
   security_groups = [module.secondary_vpc.default_security_group_id]
 
-  http_tcp_listeners = [{
-    port               = 80
-    protocol           = "HTTP"
-    target_group_index = 0
-  }]
+  listeners = {
+    http = {
+      port     = 80
+      protocol = "HTTP"
+      forward = {
+        target_group_key = "http"
+      }
+    }
+  }
 
-  target_groups = [{
-    backend_protocol = "HTTP"
-    backend_port     = 80
-    target_type      = "ip"
-  }]
+  target_groups = {
+    http = {
+      backend_protocol  = "HTTP"
+      backend_port      = 80
+      target_type       = "ip"
+      create_attachment = false
+    }
+  }
 
   tags = local.tags
 
@@ -174,11 +188,11 @@ module "global_accelerator" {
           # are obviously no healthy instances in the target group
           endpoint_configuration = [{
             client_ip_preservation_enabled = true
-            endpoint_id                    = module.alb.lb_arn
+            endpoint_id                    = module.alb.arn
             weight                         = 50
             }, {
             client_ip_preservation_enabled = false
-            endpoint_id                    = module.alb.lb_arn
+            endpoint_id                    = module.alb.arn
             weight                         = 50
           }]
 
@@ -208,11 +222,11 @@ module "global_accelerator" {
           # are obviously no healthy instances in the target group
           endpoint_configuration = [{
             client_ip_preservation_enabled = true
-            endpoint_id                    = module.secondary_alb.lb_arn
+            endpoint_id                    = module.secondary_alb.arn
             weight                         = 50
             }, {
             client_ip_preservation_enabled = false
-            endpoint_id                    = module.secondary_alb.lb_arn
+            endpoint_id                    = module.secondary_alb.arn
             weight                         = 50
           }]
 
