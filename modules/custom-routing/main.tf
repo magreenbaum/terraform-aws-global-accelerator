@@ -80,7 +80,7 @@ resource "aws_globalaccelerator_custom_routing_endpoint_group" "this" {
   }
 
   dynamic "endpoint_configuration" {
-    for_each = each.value.endpoint_group_configs.endpoint_configuration != null ? each.value.endpoint_group_configs.endpoint_configuration : []
+    for_each = [for e in each.value.endpoint_group_configs.endpoint_configuration : e if e.endpoint_id != null]
     content {
       endpoint_id = endpoint_configuration.value.endpoint_id
     }
